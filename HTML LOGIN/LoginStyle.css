@@ -1,0 +1,188 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container for forms */
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Image container */
+.imgcontainer {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 100px;
+    border-radius: 50%;
+    border: 4px solid #4CAF50;
+}
+
+/* Form elements */
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background-color: #f0fff0;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.cancelbtn {
+    width: 48%;
+    background-color: #f44336;
+}
+
+.cancelbtn:hover {
+    background-color: #e53935;
+}
+
+.psw a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.psw a:hover {
+    text-decoration: underline;
+}
+
+/* Form Footer (Links) */
+.container span {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #555;
+}
+
+.container span a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.container span a:hover {
+    text-decoration: underline;
+}
+
+/* Reset Code and New Password Container - Match style of other forms */
+#resetCodeContainer, #newPasswordContainer {
+    margin-top: 20px;
+}
+
+/* Reset Code Input */
+#resetCodeContainer input {
+    width: 80%;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+}
+
+#resetCodeContainer input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background-color: #f0fff0;
+}
+
+/* New Password Input */
+#newPasswordContainer input {
+    width: 80%;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+}
+
+#newPasswordContainer input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background-color: #f0fff0;
+}
+
+/* Reset Code Button */
+#resetCodeContainer button,
+#newPasswordContainer button {
+    width: 80%;
+    padding: 12px;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#resetCodeContainer button:hover,
+#newPasswordContainer button:hover {
+    background-color: #45a049;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    .container {
+        width: 80%;
+        padding: 20px;
+    }
+
+    .avatar {
+        width: 80px;
+    }
+}

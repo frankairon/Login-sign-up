@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Sign-Up Form</title>
+    <link rel="stylesheet" href="LoginStyle.css">
+    <script>
+        let failedAttempts = 0;
+        const maxAttempts = 3;
+        let resendTimer = null;
+
+        // Function to switch between login and signup forms
+        function toggleForm(form) {
+            const loginForm = document.getElementById("loginForm");
+            const signUpForm = document.getElementById("signUpForm");
+            const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+
+            if (form === "login") {
+                loginForm.style.display = "block";
+                signUpForm.style.display = "none";
+                forgotPasswordForm.style.display = "none";
+                resetForgotPasswordFields(); // Reset the forgot password fields when returning to the login form
+            } else if (form === "signup") {
+                loginForm.style.display = "none";
+                signUpForm.style.display = "block";
+                forgotPasswordForm.style.display = "none";
+            } else if (form === "forgot") {
+                loginForm.style.display = "none";
+                signUpForm.style.display = "none";
+                forgotPasswordForm.style.display = "block";
+                resetForgotPasswordFields(); // Reset the forgot password fields when opening the forgot password form
+            }
+        }
+
+        // Function to handle login attempt
+        function handleLogin(event) {
+            event.preventDefault(); // Prevent form submission to validate login
+
+            const password = document.forms["loginForm"]["psw"].value;
+            const email = document.forms["loginForm"]["email"].value;
+
+            // Regex pattern to validate email: r2022(6 digits)@feuroosevelt.edu.ph
+            const emailPattern = /^r2022\d{6}@feuroosevelt\.edu\.ph$/;
+
+            if (!emailPattern.test(email)) {
+                alert('Not a valid email address. Please enter a valid email address in the format: r2022[6 digits]@feuroosevelt.edu.ph');
+                return;
+            }
+
+            if (password === "password") {
+                failedAttempts = 0;
+                document.forms["loginForm"].submit();
+            } else {
+                failedAttempts++;
+                if (failedAttempts >= maxAttempts) {
+                    document.getElementById("loginForm").innerHTML = ` 
+                        <p style="color: red;">You have reached the maximum number of login attempts. Please try again later.</p>
+                    `;
+                    setTimeout(() => {
+                        failedAttempts = 0;
+                        document.getElementById("loginForm").innerHTML = ` 
+                            <div class="imgcontainer">
+                                <img src="Avatar1.png" alt="Avatar" class="avatar">
+                            </div>
+                            <div class="container">
+                                <label for="psw"><b>Password</b></label>
+                                <input type="password" placeholder="Enter Password" name="psw" required>
+                                <label for="email"><b>Email</b></label>
+                                <input type="text" placeholder="Enter Email" name="email" required>
+                                <button type="submit" onclick="handleLogin(event)">Login</button>
+                                <label>
+                                    <input type="checkbox" checked="checked" name="remember"> Remember me
+                                </label>
+                            </div>
+                            <div class="container" style="background-color:#f1f1f1">
+                                <span class="psw"><a href="javascript:void(0);" onclick="toggleForm('forgot')">Forgot password?</a></span>
+                            </div>
+                            <div class="container" style="background-color:#f1f1f1">
+                                <span>Don't have an account? <a href="javascript:void(0);" onclick="toggleForm('signup')">Sign Up</a></span>
+                            </div>
+                        `;
+                    }, 1800000); // 30 minutes
+                } else {
+                    alert(`Incorrect credentials. You have ${maxAttempts - failedAttempts} attempts left.`);
+                }
+            }
+        }
+
+        // Simulate sending reset link and verifying reset code
+        function sendResetLink(event) {
+            event.preventDefault();  // Prevent the form from being submitted normally
+
+            const email = document.getElementById('email').value;
+
+            // Regex pattern to validate email: r2022(6 digits)@feuroosevelt.edu.ph
+            const emailPattern = /^r2022\d{6}@feuroosevelt\.edu\.ph$/;
+
+            if (!emailPattern.test(email)) {
+                alert('Not a valid email address. Please enter a valid email address in the format: r2022[6 digits]@feuroosevelt.edu.ph');
+                return;
+            }
+
+            // Show reset code form after sending the reset link
+            alert(`A reset code has been sent to ${email}. Please check your email.`);
+
+            document.getElementById('emailContainer').style.display = 'none';
+            document.getElementById('resetCodeContainer').style.display = 'block';
+            document.querySelector('button[type="button"]').disabled = true;
+            document.getElementById('timerLabel').style.display = 'block';
+
+            startResendTimer();
+        }
+
+        // Start a 60 seconds countdown and show the "Resend Code" button after it ends
+        function startResendTimer() {
+            let countdown = 60;
+            const timerLabel = document.getElementById('timerLabel');
+            const resendButton = document.getElementById('resendButton');
+            
+            resendButton.style.display = 'none';
+            
+            resendTimer = setInterval(function() {
+                if (countdown <= 0) {
+                    clearInterval(resendTimer);
+                    resendButton.style.display = 'inline';
+                    timerLabel.style.display = 'none';
+                } else {
+                    timerLabel.textContent = `Time remaining: ${countdown} seconds`;
+                    countdown--;
+                }
+            }, 1000);
+        }
+
+        // Verify the reset code entered by the user
+        function verifyResetCode() {
+            const resetCode = document.getElementById('resetCode').value;
+
+            if (resetCode === "123456") {
+                document.getElementById('newPasswordContainer').style.display = "block";
+                document.getElementById('resetCodeContainer').style.display = "none";
+            } else {
+                alert("Incorrect reset code. Please try again.");
+            }
+        }
+
+        // Resend the verification code
+        function resendVerificationCode() {
+            alert("A new verification code has been sent to your email.");
+            startResendTimer();
+        }
+
+        // Back to login and retain entered email and reset code
+        function backToLogin() {
+            document.getElementById('resetCodeContainer').style.display = 'none';
+            document.getElementById('newPasswordContainer').style.display = 'none';
+            document.getElementById('timerLabel').style.display = 'none';
+            document.getElementById('resendButton').style.display = 'none';
+
+            document.getElementById('forgotPasswordForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        // Reset the forgot password fields (without clearing)
+        function resetForgotPasswordFields() {
+            document.getElementById('email').value = '';
+            document.getElementById('resetCode').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            // Ensure the correct visibility
+            document.getElementById('emailContainer').style.display = 'block';
+            document.getElementById('resetCodeContainer').style.display = 'none';
+            document.getElementById('newPasswordContainer').style.display = 'none';
+            document.getElementById('timerLabel').style.display = 'none';
+            document.getElementById('resendButton').style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+
+<!-- Login Form -->
+<form id="loginForm" name="loginForm" action="action_page.php" method="post">
+    <div class="imgcontainer">
+        <img src="Avatar1.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+        <label for="email"><b>Email</b></label>
+        <input type="text" placeholder="Enter Email" name="email" required>
+
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+
+        <button type="submit" onclick="handleLogin(event)">Login</button>
+        <label>
+            <input type="checkbox" checked="checked" name="remember"> Remember me
+        </label>
+    </div>
+
+    <div class="container" style="background-color:#f1f1f1">
+        <span class="psw"><a href="javascript:void(0);" onclick="toggleForm('forgot')">Forgot password?</a></span>
+    </div>
+
+    <div class="container" style="background-color:#f1f1f1">
+        <span>Don't have an account? <a href="javascript:void(0);" onclick="toggleForm('signup')">Sign Up</a></span>
+    </div>
+</form>
+
+<!-- Sign Up Form -->
+<form id="signUpForm" action="signup_action.php" method="post" style="display:none;">
+    <div class="imgcontainer">
+        <img src="Avatar1.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+        <label for="email"><b>Email</b></label>
+        <input type="email" placeholder="Enter Email" name="email" required>
+
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+
+        <label for="psw-repeat"><b>Confirm Password</b></label>
+        <input type="password" placeholder="Confirm Password" name="psw-repeat" required>
+
+        <!-- New Fields: Birthday, Age, Gender, Status, and Contact Number -->
+        <label for="birthday"><b>Birthday</b></label>
+        <input type="date" placeholder="Enter Your Birthday" name="birthday" required>
+
+        <label for="age"><b>Age</b></label>
+        <input type="number" placeholder="Enter Your Age" name="age" required min="1" max="120">
+
+        <label for="gender"><b>Gender</b></label>
+        <select name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select>
+
+        <label for="status"><b>Status</b></label>
+        <select name="status" required>
+            <option value="">Select Status</option>
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="divorced">Divorced</option>
+            <option value="widowed">Widowed</option>
+        </select>
+
+        <label for="contactNumber"><b>Contact Number</b></label>
+        <input type="tel" placeholder="Enter Your Contact Number" name="contactNumber" required pattern="[0-9]{10}">
+
+        <button type="submit">Sign Up</button>
+    </div>
+
+    <span class="psw">Already have an account? <a href="javascript:void(0);" onclick="toggleForm('login')">Login</a></span>
+</form>
+
+<!-- Forgot Password Form -->
+<form id="forgotPasswordForm" action="forgot_password_action.php" method="post" style="display:none;">
+    <div class="imgcontainer">
+        <img src="Avatar1.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container" id="emailContainer">
+        <label for="email"><b>Enter your email address</b></label>
+        <input type="email" placeholder="Enter Email" name="email" id="email" required>
+
+        <button type="submit" onclick="sendResetLink(event)">Send Reset Link</button>
+    </div>
+
+    <div id="resetCodeContainer" style="display:none;">
+        <label for="resetCode"><b>Enter Reset Code</b></label>
+        <input type="text" placeholder="Enter Reset Code" name="resetCode" id="resetCode" required>
+
+        <button type="button" onclick="verifyResetCode()">Verify Reset Code</button>
+    </div>
+
+    <div id="timerLabel" style="display:none;"></div>
+    <button id="resendButton" type="button" onclick="resendVerificationCode()" style="display:none;">Resend Verification Code</button>
+
+    <div id="newPasswordContainer" style="display:none;">
+        <label for="newPassword"><b>Enter New Password</b></label>
+        <input type="password" placeholder="Enter New Password" name="newPassword" id="newPassword" required>
+
+        <label for="confirmPassword"><b>Confirm New Password</b></label>
+        <input type="password" placeholder="Confirm New Password" name="confirmPassword" id="confirmPassword" required>
+
+        <button type="submit">Reset Password</button>
+    </div>
+
+    <span class="psw"><a href="javascript:void(0);" onclick="backToLogin()">Back to Login</a></span>
+</form>
+
+</body>
+</html>

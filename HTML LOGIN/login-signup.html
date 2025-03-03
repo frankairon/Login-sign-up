@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEUR Authorization</title>
+    <link rel="stylesheet" href="lsf.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-container" id="login-form">
+            <h2>Login</h2>
+            <form action="#">
+                <input type="text" id="login-email" placeholder="Email" required>
+                <div class="password-container">
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <span class="eye-icon" onclick="togglePasswordVisibility('login-password')">👁️</span>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <div class="link">
+                <a href="#" onclick="toggleForm('forgot-password-form')">Forgot Password?</a> | 
+                <a href="#" onclick="toggleForm('signup-form')">Create an Account</a>
+            </div>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div class="form-container" id="signup-form">
+            <h2>Sign Up</h2>
+            <form action="#">
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <div class="password-container">
+                    <input type="password" id="signup-password" placeholder="Password" required>
+                    <span class="eye-icon" onclick="togglePasswordVisibility('signup-password')">👁️</span>
+                </div>
+                <input type="date" id="signup-birthday" placeholder="Birthday" required>
+                <input type="number" id="signup-age" placeholder="Age" required min="1">
+
+                <!-- Gender Dropdown -->
+                <select id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+
+                <!-- Status Dropdown -->
+                <select id="status" required>
+                    <option value="">Select Status</option>
+                    <option value="parent">Parent</option>
+                    <option value="student">Student</option>
+                </select>
+
+                <input type="tel" id="signup-contact" placeholder="Contact Number" required pattern="[0-9]{11}" title="Please enter a valid 11-digit contact number">
+                
+                <!-- Checkbox for Data Privacy and Terms -->
+                <div class="checkbox-container">
+                    <label>
+                        <input type="checkbox" id="agree-checkbox" required>
+                        I agree to the <a href="/data-privacy" target="_blank">FEUR Data Privacy</a> | 
+                        <a href="/terms-conditions" target="_blank">Terms and Conditions</a>
+                    </label>
+                </div>
+
+                <button type="submit">Sign Up</button>
+            </form>
+            <div class="link">
+                <a href="#" onclick="toggleForm('login-form')">Already have an account? Login</a>
+            </div>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <div class="form-container" id="forgot-password-form">
+            <h2>Forgot Password</h2>
+            <form action="#">
+                <input type="email" id="forgot-email" placeholder="Enter your email" required>
+                <button type="button" id="send-reset-code" onclick="sendResetCode()">Send Reset Code</button>
+            </form>
+
+            <!-- Reset Code input, hidden initially -->
+            <div id="reset-code-container" style="display: none;">
+                <input type="text" id="reset-code" placeholder="Enter reset code" required maxlength="6" pattern="\d{6}" title="Reset code must be exactly 6 digits">
+                <button type="button" onclick="verifyResetCode()">Verify Reset Code</button>
+            </div>
+
+            <!-- New Password Fields, hidden initially -->
+            <div id="new-password-container" style="display: none;">
+                <div class="password-container">
+                    <input type="password" id="new-password" placeholder="Enter new password" required>
+                    <span class="eye-icon" onclick="togglePasswordVisibility('new-password')">👁️</span>
+                </div>
+                <div class="password-container">
+                    <input type="password" id="confirm-password" placeholder="Confirm new password" required>
+                    <span class="eye-icon" onclick="togglePasswordVisibility('confirm-password')">👁️</span>
+                </div>
+                <button type="button" onclick="resetPassword()">Reset Password</button>
+            </div>
+
+            <div class="link">
+                <a href="#" onclick="toggleForm('login-form')">Back to Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let resetCodeRequests = 0; // Track how many times the user has requested a reset code
+        const maxRequests = 3; // Maximum number of requests allowed
+        let resetTimer; // Timer variable for enabling the button after 60 seconds
+
+        // Toggle between forms
+        function toggleForm(formId) {
+            // Hide all forms
+            document.querySelectorAll('.form-container').forEach(function(form) {
+                form.classList.remove('show');
+            });
+
+            // Clear all input fields in all forms
+            clearFormFields();
+
+            // Show the selected form
+            document.getElementById(formId).classList.add('show');
+        }
+
+        // Function to clear all form fields
+        function clearFormFields() {
+            // Get all form elements inside the container
+            const inputs = document.querySelectorAll('.form-container input, .form-container select');
+
+            // Loop through all input fields and clear their values
+            inputs.forEach(function(input) {
+                if (input.type === 'checkbox') {
+                    input.checked = false; // Reset checkbox
+                } else {
+                    input.value = ''; // Clear other fields (text, number, date, etc.)
+                }
+            });
+
+            // Reset the button text for reset code
+            document.getElementById("send-reset-code").innerText = "Send Reset Code";
+            document.getElementById("send-reset-code").disabled = false;
+
+            // Hide the reset code input field
+            document.getElementById("reset-code-container").style.display = "none";
+            document.getElementById("new-password-container").style.display = "none";
+        }
+
+        // Function to handle the "Send Reset Code" button
+        function sendResetCode() {
+            const email = document.getElementById('forgot-email').value;
+
+            // Check if the email field is empty
+            if (!email) {
+                alert("Please enter your email.");
+                return;
+            }
+
+            // Check if the user has already requested the maximum number of reset codes
+            if (resetCodeRequests >= maxRequests) {
+                alert("You have reached the maximum number of reset code requests.");
+                return;
+            }
+
+            // Simulate sending the reset code
+            alert("Reset code sent to your email!");
+
+            // Increase the number of requests
+            resetCodeRequests++;
+
+            // Show the reset code input field
+            document.getElementById("reset-code-container").style.display = "block";
+
+            // Change button text and disable it
+            document.getElementById("send-reset-code").innerText = "Code Sent";
+            document.getElementById("send-reset-code").disabled = true;
+
+            // Enable the button again after 60 seconds
+            resetTimer = setTimeout(() => {
+                document.getElementById("send-reset-code").innerText = "Send Reset Code";
+                document.getElementById("send-reset-code").disabled = false;
+            }, 60000); // 60 seconds
+        }
+
+        function verifyResetCode() {
+            const resetCode = document.getElementById('reset-code').value;
+
+            // Check if the reset code is valid (6 digits)
+            if (resetCode.length === 6 && /^\d{6}$/.test(resetCode)) {
+                document.getElementById("new-password-container").style.display = "block";
+                document.getElementById("reset-code-container").style.display = "none";
+            } else {
+                alert("Invalid reset code. Please enter a 6-digit code.");
+            }
+        }
+
+        function resetPassword() {
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Validate that the password fields are not blank
+            if (!newPassword || !confirmPassword) {
+                alert("Both password fields must be filled.");
+                return;
+            }
+
+            // Check if the passwords match
+            if (newPassword === confirmPassword) {
+                alert("Password successfully reset!");
+                toggleForm('login-form');
+            } else {
+                alert("Passwords do not match. Please try again.");
+            }
+        }
+
+        // Toggle the visibility of password fields
+        function togglePasswordVisibility(passwordFieldId) {
+            const passwordField = document.getElementById(passwordFieldId);
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+        }
+
+        // Initially show the login form
+        toggleForm('login-form');
+    </script>
+
+</body>
+</html>
